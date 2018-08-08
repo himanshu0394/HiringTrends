@@ -5,7 +5,6 @@ Created on Fri Aug  3 12:54:00 2018
 
 @author: kittiekuo
 """
-
 import pandas as pd
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -21,11 +20,18 @@ from nltk.corpus import stopwords
 from collections import Counter
 from nltk.stem.porter import *
 
-df1 = pd.read_csv('Apple_60.csv')
-df2 = pd.read_csv('Deloitte_60.csv')
-df3 = pd.read_csv('Google_60.csv')
+df1 = pd.read_csv('Ameriprise Financial 08-05-18 20.43.46.csv')
+df2 = pd.read_csv('deloitte 08-05-18 16.02.31.csv')
+df3 = pd.read_csv('facebook 08-05-18 15.58.14.csv')
+df4 = pd.read_csv('General Mills 08-05-18 20.36.59.csv')
+df5 = pd.read_csv('Google 08-05-18 15.25.58.csv')
+df6 = pd.read_csv('kpmg 08-05-18 16.01.04.csv')
+df7 = pd.read_csv('Land O Lakes 08-05-18 20.42.50.csv')
+df8 = pd.read_csv('pwc 08-05-18 15.55.24.csv')
+df9 = pd.read_csv('Slalom Consulting 08-05-18 20.45.08.csv')
+df10 = pd.read_csv('Wallmart 08-05-18 15.51.20.csv')
 
-filename = [df1, df2, df3]
+filename = [df1, df2, df3, df4, df5, df6,df7, df8, df9, df10]
 countlist = []
 
 for file in filename:
@@ -39,12 +45,12 @@ for file in filename:
       tokens = nltk.word_tokenize(no_punctuation)
       return tokens
     
-    # count overall frequency
+    # original count overall frequency
     tokens = get_tokens(str(file['Job Title']))
     count = Counter(tokens)
-    count.most_common(10)
+    count.most_common(5)
     
-    # get rid of stop words / stemming
+
     def stem_tokens(tokens, stemmer):
       stemmed = []
       for item in tokens:
@@ -59,12 +65,16 @@ for file in filename:
     stemmer = PorterStemmer()
     stemmed = stem_tokens(filtered, stemmer)
     
-    count = Counter(stemmed)
-    count.most_common(10)
+    count = Counter(filtered)
+    count.most_common(5)
+    
+    count_st = Counter(stemmed)
+    count_st.most_common(5)
     
     countlist.append(count)
 ##################################
 
+#### without stemming
 #TF-IDF(t)=TF(t)×IDF(t)
 def tf(word, count):
   return count[word] / sum(count.values())
