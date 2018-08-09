@@ -18,6 +18,7 @@ import math
 import string
 from nltk.corpus import stopwords
 from collections import Counter
+from nltk import ngrams
 from nltk.stem.porter import *
 
 df1 = pd.read_csv('Ameriprise Financial 08-05-18 20.43.46.csv')
@@ -31,8 +32,9 @@ df8 = pd.read_csv('pwc 08-05-18 15.55.24.csv')
 df9 = pd.read_csv('Slalom Consulting 08-05-18 20.45.08.csv')
 df10 = pd.read_csv('Wallmart 08-05-18 15.51.20.csv')
 
-filename = [df1, df2, df3, df4, df5, df6,df7, df8, df9, df10]
+filename = [df1, df2, df3, df4, df5, df6, df7, df8, df9, df10]
 countlist = []
+
 
 for file in filename:
     
@@ -60,6 +62,7 @@ for file in filename:
     # get rid of stop words/ numbers
     filtered = [w for w in tokens if not w in stopwords.words('english')]
     filtered = [w for w in tokens if not w.isdigit() == True]
+    filtered = [w for w in tokens if not len(w) <= 2]
     
     # get rid of stemming
     stemmer = PorterStemmer()
@@ -72,9 +75,23 @@ for file in filename:
     count_st.most_common(5)
     
     countlist.append(count)
-##################################
+    
+    # ngram by two
+    twicegrams = ngrams(filtered, 2)
+    lst_combine = list()
+    for grams in twicegrams:
+        lst_combine.append(grams)
+    
+    count_twicegram = Counter(lst_combine)
+    countlist.append(count_twicegram)
+    
+    with open('count_twicegram.csv','w') as file:
+        for line in countlist:
+            file.write(str(line))
+            file.write('\n')
+    
+#### without stemming ######
 
-#### without stemming
 #TF-IDF(t)=TF(t)×IDF(t)
 def tf(word, count):
   return count[word] / sum(count.values())
