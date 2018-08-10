@@ -22,17 +22,17 @@ from nltk import ngrams
 from nltk.stem.porter import *
 
 df1 = pd.read_csv('Ameriprise Financial 08-05-18 20.43.46.csv')
-#df2 = pd.read_csv('deloitte 08-05-18 16.02.31.csv')
-#df3 = pd.read_csv('facebook 08-05-18 15.58.14.csv')
-#df4 = pd.read_csv('General Mills 08-05-18 20.36.59.csv')
-#df5 = pd.read_csv('Google 08-05-18 15.25.58.csv')
-#df6 = pd.read_csv('kpmg 08-05-18 16.01.04.csv')
-#df7 = pd.read_csv('Land O Lakes 08-05-18 20.42.50.csv')
-#df8 = pd.read_csv('pwc 08-05-18 15.55.24.csv')
-#df9 = pd.read_csv('Slalom Consulting 08-05-18 20.45.08.csv')
-#df10 = pd.read_csv('Wallmart 08-05-18 15.51.20.csv')
+df2 = pd.read_csv('deloitte 08-05-18 16.02.31.csv')
+df3 = pd.read_csv('facebook 08-05-18 15.58.14.csv')
+df4 = pd.read_csv('General Mills 08-05-18 20.36.59.csv')
+df5 = pd.read_csv('Google 08-05-18 15.25.58.csv')
+df6 = pd.read_csv('kpmg 08-05-18 16.01.04.csv')
+df7 = pd.read_csv('Land O Lakes 08-05-18 20.42.50.csv')
+df8 = pd.read_csv('pwc 08-05-18 15.55.24.csv')
+df9 = pd.read_csv('Slalom Consulting 08-05-18 20.45.08.csv')
+df10 = pd.read_csv('Wallmart 08-05-18 15.51.20.csv')
 #, df2, df3, df4, df5, df6,df7, df8, df9, df10
-filename = [df1]
+filename = [df1,df2, df3, df4, df5, df6,df7, df8, df9, df10]
 
 b = pd.DataFrame()
 for file in filename:
@@ -102,6 +102,10 @@ for file in filename:
         b = b.append(a)
         b=b.append(c)
 
+        #scores = {word: tfidf(word, count, countlist) for word in count}
+
+
+
 
 
     def stem_tokens(tokens, stemmer):
@@ -113,7 +117,7 @@ for file in filename:
 
 
 
-b.to_csv('Ameri_delloitte_fb_genMill_googl_bigrms.csv', sep=',', encoding='utf-8')
+b.to_csv('am_deloi_google_kpmg_fb_land_pwc_slalom_walmart_genmills_bigrms.csv', sep=',', encoding='utf-8')
 
 ##################################
 
