@@ -10,6 +10,7 @@ import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model.logistic import LogisticRegression
 from sklearn.model_selection import train_test_split, cross_val_score
+import os
 
 import nltk
 nltk.download('punkt')
@@ -21,22 +22,29 @@ from collections import Counter
 from nltk import ngrams
 from nltk.stem.porter import *
 
-df1 = pd.read_csv('Ameriprise Financial 08-05-18 20.43.46.csv')
-df2 = pd.read_csv('deloitte 08-05-18 16.02.31.csv')
-df3 = pd.read_csv('facebook 08-05-18 15.58.14.csv')
-df4 = pd.read_csv('General Mills 08-05-18 20.36.59.csv')
-df5 = pd.read_csv('Google 08-05-18 15.25.58.csv')
-df6 = pd.read_csv('kpmg 08-05-18 16.01.04.csv')
-df7 = pd.read_csv('Land O Lakes 08-05-18 20.42.50.csv')
-df8 = pd.read_csv('pwc 08-05-18 15.55.24.csv')
-df9 = pd.read_csv('Slalom Consulting 08-05-18 20.45.08.csv')
-df10 = pd.read_csv('Wallmart 08-05-18 15.51.20.csv')
+#df1 = pd.read_csv('Ameriprise Financial 08-05-18 20.43.46.csv')
+#df2 = pd.read_csv('deloitte 08-05-18 16.02.31.csv')
+#df3 = pd.read_csv('facebook 08-05-18 15.58.14.csv')
+#df4 = pd.read_csv('General Mills 08-05-18 20.36.59.csv')
+#df5 = pd.read_csv('Google 08-05-18 15.25.58.csv')
+#df6 = pd.read_csv('kpmg 08-05-18 16.01.04.csv')
+#df7 = pd.read_csv('Land O Lakes 08-05-18 20.42.50.csv')
+#df8 = pd.read_csv('pwc 08-05-18 15.55.24.csv')
+#df9 = pd.read_csv('Slalom Consulting 08-05-18 20.45.08.csv')
+#df10 = pd.read_csv('Wallmart 08-05-18 15.51.20.csv')
 #, df2, df3, df4, df5, df6,df7, df8, df9, df10
-filename = [df1,df2, df3, df4, df5, df6,df7, df8, df9, df10]
+files = [s for s in os.listdir() if s.endswith('.csv')]
+filename = files
 
 b = pd.DataFrame()
 for file in filename:
-    d = file.sort_values(by = 'Location')
+
+    d = pd.read_csv(file).dropna()
+    if not(d.empty):
+       d= d.sort_values(by = 'Location')
+    else:
+        continue
+    print(file)
     d = d.reset_index(drop=True)
 
     countlist = []
@@ -51,6 +59,7 @@ for file in filename:
       tokens = nltk.word_tokenize(no_punctuation)
       return tokens
     loctn = list(d['Location'])
+    #industry = list(d['Industry'])
     l=set(loctn)
     l = list(l)
 
@@ -58,6 +67,8 @@ for file in filename:
     for locat in l:
         file = d[d['Location']==locat]
         comp_name = d[d['Location']==locat]['Company Name'].values[0]
+        ind = d[d['Location']==locat]['Industry'].values[0]
+        state = d[d['Location']==locat]['State'].values[0]
         tokens = get_tokens(str(file['Job Title']))
         count = Counter(tokens)
         count.most_common(5)
@@ -95,11 +106,14 @@ for file in filename:
         a.columns = ['Keyword','count']
         a['Company'] = comp_name
         a['Location'] = locat
+        a['State'] = state
         c = pd.DataFrame(c)
         c.columns = ['Keyword','count']
         c['Company'] = comp_name
         c['Location'] = locat
+        c['State'] = state
         b = b.append(a)
+        b['Industry'] = ind
         b=b.append(c)
 
         #scores = {word: tfidf(word, count, countlist) for word in count}
@@ -117,7 +131,7 @@ for file in filename:
 
 
 
-b.to_csv('am_deloi_google_kpmg_fb_land_pwc_slalom_walmart_genmills_bigrms.csv', sep=',', encoding='utf-8')
+b.to_csv('Fortune500_bigrms_New.csv', sep=',', encoding='utf-8')
 
 ##################################
 
