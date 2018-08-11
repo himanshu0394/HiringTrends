@@ -21,6 +21,7 @@ from nltk.corpus import stopwords
 from collections import Counter
 from nltk import ngrams
 from nltk.stem.porter import *
+import os
 
 #df1 = pd.read_csv('Ameriprise Financial 08-05-18 20.43.46.csv')
 #df2 = pd.read_csv('deloitte 08-05-18 16.02.31.csv')
@@ -35,6 +36,8 @@ from nltk.stem.porter import *
 #, df2, df3, df4, df5, df6,df7, df8, df9, df10
 files = [s for s in os.listdir() if s.endswith('.csv')]
 filename = files
+
+categories = pd.read_csv('../KeywordCategory.csv', index_col=0, squeeze=True)
 
 b = pd.DataFrame()
 for file in filename:
@@ -129,9 +132,8 @@ for file in filename:
       return stemmed
 
 
-
-
-b.to_csv('Fortune500_bigrms_New.csv', sep=',', encoding='utf-8')
+b['Category']=b.apply(lambda x: categories.get(x[2], x[2]), axis=1)
+b.to_csv('Fortune500_bigrms.csv', sep=',', encoding='utf-8')
 
 ##################################
 
