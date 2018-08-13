@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Aug  8 17:26:30 2018
+Created on Sat Aug 11 21:16:25 2018
 
 @author: 13pra
 """
@@ -37,10 +37,12 @@ import os
 files = [s for s in os.listdir() if s.endswith('.csv')]
 filename = files
 
-categories_df = pd.read_csv('../KeywordCategory.csv')
+categories_df = pd.read_csv('C:\\Users\\13pra\\OneDrive\\Desktop\\Python\\KeywordCategory.csv')
 categories_df=categories_df.drop_duplicates()
 categories =pd.Series(categories_df.iloc[:,1])
 categories.index =pd.Series(categories_df.iloc[:,0])
+black_list = pd.read_csv('C:\\Users\\13pra\\OneDrive\\Desktop\\Python\\list_to_drop.csv',header = None)
+m = list(black_list[0])
 
 b = pd.DataFrame()
 for file in filename:
@@ -136,6 +138,8 @@ for file in filename:
 
 
 b['Category']=b.apply(lambda x: categories.get(x[2], x[2]).title(), axis=1)
+b['Keyword'] = b['Keyword'].apply(lambda x: x if x not in m else np.NaN)
+b=b.dropna()
 b.to_csv('Fortune500_bigrms.csv', sep=',', encoding='utf-8')
 
 ##################################
