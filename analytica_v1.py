@@ -23,16 +23,6 @@ from nltk import ngrams
 from nltk.stem.porter import *
 import os
 
-#df1 = pd.read_csv('Ameriprise Financial 08-05-18 20.43.46.csv')
-#df2 = pd.read_csv('deloitte 08-05-18 16.02.31.csv')
-#df3 = pd.read_csv('facebook 08-05-18 15.58.14.csv')
-#df4 = pd.read_csv('General Mills 08-05-18 20.36.59.csv')
-#df5 = pd.read_csv('Google 08-05-18 15.25.58.csv')
-#df6 = pd.read_csv('kpmg 08-05-18 16.01.04.csv')
-#df7 = pd.read_csv('Land O Lakes 08-05-18 20.42.50.csv')
-#df8 = pd.read_csv('pwc 08-05-18 15.55.24.csv')
-#df9 = pd.read_csv('Slalom Consulting 08-05-18 20.45.08.csv')
-#df10 = pd.read_csv('Wallmart 08-05-18 15.51.20.csv')
 #, df2, df3, df4, df5, df6,df7, df8, df9, df10
 files = [s for s in os.listdir() if s.endswith('.csv')]
 filename = files
@@ -45,6 +35,9 @@ black_list = pd.read_csv('C:\\Users\\13pra\\OneDrive\\Desktop\\Python\\list_to_d
 m = list(black_list[0])
 
 b = pd.DataFrame()
+f = pd.DataFrame()
+e = pd.DataFrame()
+countlist = []
 for file in filename:
 
     d = pd.read_csv(file).dropna()
@@ -55,7 +48,7 @@ for file in filename:
     print(file)
     d = d.reset_index(drop=True)
 
-    countlist = []
+
 
 
     # initial cleaning
@@ -95,7 +88,7 @@ for file in filename:
 #        count_st = Counter(stemmed)
 #        count_st.most_common(5)
 
-        #countlist.append(count)
+        countlist.append(count)
 
         twicegrams = ngrams(filtered, 2)
         lst_combine = list()
@@ -105,6 +98,7 @@ for file in filename:
 
         count_twicegram = Counter(lst_combine)
         countlist.append(count_twicegram)
+
 
 
         a = count.most_common(len(count))
@@ -125,7 +119,15 @@ for file in filename:
         b=b.append(c)
 
         #scores = {word: tfidf(word, count, countlist) for word in count}
-
+        for i, count in enumerate(countlist):
+            scores = {word: tfidf(word, count, countlist) for word in count}
+            sorted_words = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+            sorted_words = dict(sorted_words)
+            e = pd.Series(sorted_words)
+            e =e.to_frame()
+            e.reset_index(level=0, inplace=True)
+            e.columns = ['Keyword','Tf-Idf']
+            f = f.append(e)
 
 
 
@@ -137,10 +139,46 @@ for file in filename:
       return stemmed
 
 
+def tf(word, count):
+  return count[word] / sum(count.values())
+
+def n_containing(word, countlist):
+    return sum(1 for count in countlist if word in count)
+
+def idf(word, countlist):
+  return math.log(len(countlist) / (1 + n_containing(word, countlist)))
+
+def tfidf(word, count, countlist):
+  return tf(word, count) * idf(word, countlist)
+
+
+
+
+#for i, count in enumerate(countlist):
+#    scores = {word: tfidf(word, count, countlist) for word in count}
+#    sorted_words = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+#    sorted_words = dict(sorted_words)
+#    e = pd.Series(sorted_words)
+#    e =e.to_frame()
+#    e.reset_index(level=0, inplace=True)
+#    e.columns = ['Keyword','Tf-Idf']
+#    f = f.append(e)
+
+def idfchk(wrd):
+    if len(f[f['Keyword'] == wrd]['Tf-Idf'].values) !=0:
+        return f[f['Keyword'] == wrd]['Tf-Idf'].values[0]
+
+#b = b.dropna()
+#b = pd.merge(b,f, on='Keyword')
 b['Category']=b.apply(lambda x: categories.get(x[2], x[2]).title(), axis=1)
 b['Keyword'] = b['Keyword'].apply(lambda x: x if x not in m else np.NaN)
+b['Tf-Idf'] = b['Keyword'].apply(idfchk)
+
 b=b.dropna()
-b.to_csv('Fortune500_bigrms.csv', sep=',', encoding='utf-8')
+
+
+
+#b.to_csv('Fortune500_bigrms_tf.csv', sep=',', encoding='utf-8')
 
 ##################################
 
@@ -157,6 +195,12 @@ def idf(word, countlist):
 
 def tfidf(word, count, countlist):
   return tf(word, count) * idf(word, countlist)
+
+def tfid_get(word):
+    global countlist
+    scores = idf(word,countlist)
+    return scores
+
 
 #for i, count in enumerate(countlist):
 #  print("Top words")
